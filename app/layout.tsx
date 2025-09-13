@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "https://forex-lite.vercel.app/",
-    title: "Let AI Handle Your WhatsApp Group Posting",
+    title: "Trade with Confidence — And Feel Good Doing It",
     description:
       "Stop second-guessing. Start trading with clarity, confidence, and a community that has your back.",
     siteName: "Trade with Confidence — And Feel Good Doing It",
