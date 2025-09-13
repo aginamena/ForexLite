@@ -66,7 +66,7 @@ export default function Text() {
           gutterBottom
           sx={{ textAlign: "center" }}
         >
-          Here's How You Will Trade with Confidence
+          Here&#39;s How You Will Trade with Confidence
         </Typography>
         <Grid container spacing={4}>
           {features.map((feature, index) => (
