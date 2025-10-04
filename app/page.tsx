@@ -1,4 +1,4 @@
-import { Button, Container, Grid, Typography } from "@mui/material";
+import { Container, Grid, Typography } from "@mui/material";
 import Link from "next/link";
 
 import InsightCard from "@/components/InsightCard";
@@ -47,7 +47,6 @@ export default async function Home() {
           </Grid>
         ))}
       </Grid>
-      <Button>View More Lessons</Button>
     </Container>
   );
 }
