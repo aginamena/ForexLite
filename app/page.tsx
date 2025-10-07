@@ -22,7 +22,7 @@ export default function Home() {
   }, [transcript]);
 
   if (!browserSupportsSpeechRecognition) {
-    return <span>Browser doesn't support speech recognition.</span>;
+    return <span>Your Browser does not support speech recognition.</span>;
   }
 
   async function getNotesFromTranscript() {
