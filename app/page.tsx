@@ -1,52 +1,62 @@
-import { Container, Grid, Typography } from "@mui/material";
-import Link from "next/link";
+"use client";
 
-import InsightCard from "@/components/InsightCard";
-import dbAdmin from "@/config/firebaseAdmin";
+import { useEffect, useState } from "react";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
+import ReactMarkdown from "react-markdown";
 
-export default async function Home() {
-  const lessonsDoc = await dbAdmin
-    .collection("lessons")
-    .orderBy("id", "desc")
-    .get();
-  const lessons = lessonsDoc.docs.map((doc) => doc.data());
+export default function Home() {
+  const [compiledTranscript, setCompiledTranscript] = useState("");
+  const [detailedNote, setDetailedNote] = useState("");
+
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
+
+  useEffect(() => {
+    setCompiledTranscript((prev) => prev + " " + transcript);
+  }, [transcript]);
+
+  if (!browserSupportsSpeechRecognition) {
+    return <span>Browser doesn't support speech recognition.</span>;
+  }
+
+  async function getNotesFromTranscript() {
+    const request = await fetch("/api/detailed_note", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ transcript: compiledTranscript }),
+    });
+    const { text } = await request.json();
+    setDetailedNote(text);
+  }
 
   return (
-    <Container>
-      <Typography variant="h6" align="center" gutterBottom sx={{ mt: 4 }}>
-        {/* We are compiling valuable trading lessons on forex that typically come
-        from years of experience, expert guidance, and hard work. We're
-        revealing these lessons so you don't have to spend years figuring it out
-        on your own. Instead, you can spend just a few minutes reading and
-        absorbing wisdom from professionals who have dedicated years to
-        mastering these principles and applying them to their own trading */}
-        We’re compiling valuable forex trading lessons from industry
-        professionals—lessons that could take years to learn, if you ever figure
-        them out on your own. Spend just a few minutes reading the lessons below
-        and watch your trading improve.
-      </Typography>
-
-      <Typography
-        variant="h5"
-        gutterBottom
-        fontWeight="bold"
-        sx={{ textAlign: "center" }}
+    <div>
+      <p>Microphone: {listening ? "on" : "off"}</p>
+      <button
+        onClick={() => {
+          SpeechRecognition.startListening({ continuous: true });
+        }}
       >
-        Latest Lessons
-      </Typography>
-      <Grid
-        container
-        spacing={{ xs: 2, md: 3 }}
-        columns={{ xs: 4, sm: 8, md: 12 }}
+        Start
+      </button>
+      <button
+        onClick={() => {
+          SpeechRecognition.stopListening();
+          getNotesFromTranscript();
+        }}
       >
-        {lessons.map(({ title, description, url }, index) => (
-          <Grid key={index} size={{ xs: 2, sm: 4, md: 4 }}>
-            <Link href={`lessons/${title.toLowerCase().replaceAll(" ", "-")}`}>
-              <InsightCard title={title} description={description} url={url} />
-            </Link>
-          </Grid>
-        ))}
-      </Grid>
-    </Container>
+        Stop
+      </button>
+      <button onClick={resetTranscript}>Reset</button>
+      <ReactMarkdown>{detailedNote}</ReactMarkdown>
+    </div>
   );
 }
